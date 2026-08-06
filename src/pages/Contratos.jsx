@@ -263,7 +263,7 @@ export default function Contratos() {
         Maestro Vidal 1160<br/>
         Barrio Los Platanos
       </div>
-      <h1>CONTRATO DE LOCACIÓN</h1>
+      <h1>CONTRATO DE LOCACIÓN${contrato.numero_contrato ? ' N° ' + contrato.numero_contrato : ''}</h1>
       <p>
         En la Ciudad de Córdoba a los ${hoy.dia} días del mes de ${hoy.mes} de ${hoy.anio}, se reúnen
         ${propietario ? `la Señor/a <strong>${propietario.nombre} ${propietario.apellido}</strong>, Documento Nacional de Identidad Número ${propietario.dni || '________'}, con domicilio en ${propietario.direccion || '________'}` : '________'},
@@ -445,12 +445,13 @@ export default function Contratos() {
         <table>
           <thead>
             <tr>
-              <th>Tipo</th><th>Propiedad</th><th>Inquilino/Comprador</th><th>Propietario</th><th>Importe</th><th>Vence</th><th>Estado</th><th></th>
+              <th>N°</th><th>Tipo</th><th>Propiedad</th><th>Inquilino/Comprador</th><th>Propietario</th><th>Importe</th><th>Vence</th><th>Estado</th><th></th>
             </tr>
           </thead>
           <tbody>
             {contratos.map(c => (
               <tr key={c.id}>
+                <td>{c.numero_contrato ? `#${c.numero_contrato}` : '—'}</td>
                 <td>{c.tipo}</td>
                 <td>{nombreProp(c.propiedad_id)}</td>
                 <td>{nombreCliente(c.cliente_id)}</td>
