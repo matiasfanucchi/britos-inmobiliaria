@@ -64,6 +64,7 @@ export default function Contratos() {
   const [propiedades, setPropiedades] = useState([])
   const [clientes, setClientes] = useState([])
   const [modalAbierto, setModalAbierto] = useState(false)
+  const [busqueda, setBusqueda] = useState('')
   const [form, setForm] = useState(vacio)
   const [editandoId, setEditandoId] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -132,7 +133,7 @@ export default function Contratos() {
     let error
     if (editandoId) {
       ({ error } = await supabase.from('contratos').update(payload).eq('id', editandoId))
-    } else {
+      } else {
       ({ error } = await supabase.from('contratos').insert(payload))
     }
     if (error) {
@@ -141,7 +142,7 @@ export default function Contratos() {
     }
     setModalAbierto(false)
     cargarDatos()
-    }
+  }
 
   async function eliminar(id) {
     if (!confirm('¿Eliminar este contrato?')) return
@@ -263,13 +264,14 @@ export default function Contratos() {
         Maestro Vidal 1160<br/>
         Barrio Los Platanos
       </div>
-      <h1>CONTRATO DE LOCACIÓN${contrato.numero_contrato ? ' N° ' + contrato.numero_contrato : ''}</h1>
+      <h1>CONTRATO DE LOCACIÓN</h1>
       <p>
         En la Ciudad de Córdoba a los ${hoy.dia} días del mes de ${hoy.mes} de ${hoy.anio}, se reúnen
         ${propietario ? `la Señor/a <strong>${propietario.nombre} ${propietario.apellido}</strong>, Documento Nacional de Identidad Número ${propietario.dni || '________'}, con domicilio en ${propietario.direccion || '________'}` : '________'},
         en su carácter de <strong>LOCADOR</strong> y ${inquilino ? `el Señor/a <strong>${inquilino.nombre} ${inquilino.apellido}</strong>, Documento Nacional de Identidad Número ${inquilino.dni || '________'}, TE: ${inquilino.telefono || '________'}, con domicilio en ${inquilino.direccion || '________'}` : '________'},
         en adelante <strong>LOCATARIO</strong>, por otra parte, convienen de mutuo acuerdo en celebrar este contrato que se regirá de acuerdo a lo estipulado en el Código Civil y Comercial, disposiciones vigentes y por las siguientes cláusulas:
       </p>
+
       <p><span class="clausula-titulo">PRIMERA: INMUEBLE LOCADO:</span> El LOCADOR cede al LOCATARIO en Locación un inmueble de su propiedad ubicado en
         ${propiedad?.direccion || '________'}${propiedad?.barrio ? `, de Barrio ${propiedad.barrio}` : ''} de la provincia de CORDOBA.</p>
 
@@ -396,8 +398,7 @@ export default function Contratos() {
     document.execCommand(comando, false, valor)
     if (editorRef.current) editorRef.current.focus()
   }
-
-  async function guardarTextoContrato() {
+async function guardarTextoContrato() {
     const html = editorRef.current.innerHTML
     const { error } = await supabase.from('contratos').update({ texto_contrato: html }).eq('id', contratoEditor.id)
     if (error) alert('No se pudo guardar: ' + error.message)
@@ -431,16 +432,24 @@ export default function Contratos() {
     setTimeout(() => ventana.print(), 300)
   }
 
+  const contratosFiltrados = contratos.filter(c => {
+    const texto = busqueda.trim().toLowerCase()
+    if (!texto) return true
+    const numero = c.numero_contrato ? String(c.numero_contrato) : ''
+    const direccion = nombreProp(c.propiedad_id).toLowerCase()
+    return numero.includes(texto) || direccion.includes(texto)
+  })
+
   return (
     <div>
       <h1>Contratos</h1>
       <div className="toolbar">
-        <div />
+        <input placeholder="Buscar por N° de contrato o dirección..." value={busqueda} onChange={e => setBusqueda(e.target.value)} />
         <button className="btn-primary" onClick={abrirNuevo}>+ Nuevo contrato</button>
       </div>
 
-      {loading ? <p>Cargando...</p> : contratos.length === 0 ? (
-        <div className="empty">No hay contratos cargados todavía.</div>
+      {loading ? <p>Cargando...</p> : contratosFiltrados.length === 0 ? (
+        <div className="empty">No hay contratos que coincidan con la búsqueda.</div>
       ) : (
         <table>
           <thead>
@@ -449,7 +458,7 @@ export default function Contratos() {
             </tr>
           </thead>
           <tbody>
-            {contratos.map(c => (
+            {contratosFiltrados.map(c => (
               <tr key={c.id}>
                 <td>{c.numero_contrato ? `#${c.numero_contrato}` : '—'}</td>
                 <td>{c.tipo}</td>
@@ -587,9 +596,7 @@ export default function Contratos() {
                     <span onClick={() => verDocumento(d)} style={{ cursor: 'pointer', color: '#5b2c8f' }}>{d.nombre_archivo}</span>
                     <button type="button" className="btn-danger" style={{ padding: '2px 8px' }} onClick={() => eliminarDocumento(d)}>x</button>
                   </div>
-                ))}
-
-                <div className="modal-actions">
+                ))}<div className="modal-actions">
                   <button type="button" className="btn-danger" onClick={() => eliminarGarante(g.id)}>Eliminar garante</button>
                 </div>
               </div>
