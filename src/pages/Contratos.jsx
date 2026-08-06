@@ -67,10 +67,15 @@ export default function Contratos() {
       fecha_inicio: form.fecha_inicio || null,
       fecha_fin: form.fecha_fin || null,
     }
+    let error
     if (editandoId) {
-      await supabase.from('contratos').update(payload).eq('id', editandoId)
+      ({ error } = await supabase.from('contratos').update(payload).eq('id', editandoId))
     } else {
-      await supabase.from('contratos').insert(payload)
+      ({ error } = await supabase.from('contratos').insert(payload))
+    }
+    if (error) {
+      alert('No se pudo guardar el contrato: ' + error.message)
+      return
     }
     setModalAbierto(false)
     cargarDatos()
