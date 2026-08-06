@@ -42,6 +42,20 @@ export default function Propiedades() {
 
   async function guardar(e) {
     e.preventDefault()
+
+    const direccionLimpia = (form.direccion || '').trim().toLowerCase()
+    if (direccionLimpia) {
+      const duplicada = propiedades.find(p =>
+        (p.direccion || '').trim().toLowerCase() === direccionLimpia && p.id !== editandoId
+      )
+      if (duplicada) {
+        const seguir = confirm(
+          `Ya hay una propiedad cargada en esa dirección: "${duplicada.direccion}" (${duplicada.estado}).\n\n¿Querés guardarla igual?`
+        )
+        if (!seguir) return
+      }
+    }
+
     const payload = {
       ...form,
       cliente_id: form.cliente_id || null,

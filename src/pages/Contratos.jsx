@@ -107,6 +107,19 @@ export default function Contratos() {
 
   async function guardar(e) {
     e.preventDefault()
+
+    if (form.estado === 'vigente' && form.propiedad_id) {
+      const otroVigente = contratos.find(c =>
+        c.propiedad_id === form.propiedad_id && c.estado === 'vigente' && c.id !== editandoId
+      )
+      if (otroVigente) {
+        const seguir = confirm(
+          `Esta propiedad ya tiene un contrato vigente cargado (${nombreCliente(otroVigente.cliente_id)}).\n\n¿Querés guardar este contrato igual?`
+        )
+        if (!seguir) return
+      }
+    }
+
     const payload = {
       ...form,
       propietario_id: form.propietario_id || null,
