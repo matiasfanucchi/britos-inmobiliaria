@@ -593,7 +593,7 @@ export default function Contratos() {
 
       {modalTextoAbierto && contratoEditor && (
         <div className="modal-overlay" onClick={() => setModalTextoAbierto(false)}>
-          <div className="modal" style={{ width: '95vw', maxWidth: 1100, height: '92vh', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
+          <div className="modal" style={{ width: '95vw', maxWidth: 1100, height: '99vh', maxHeight: 'none', margin: 0, display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
             <h2>Contrato — {nombreProp(contratoEditor.propiedad_id)}</h2>
             <p style={{ fontSize: 12, color: '#777' }}>Podés hacer clic en cualquier parte del texto y editarlo directamente.</p>
 
