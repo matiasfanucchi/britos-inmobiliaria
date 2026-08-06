@@ -105,12 +105,13 @@ export default function Propiedades() {
         <table>
           <thead>
             <tr>
-              <th>Dirección</th><th>Barrio</th><th>Operación</th><th>Propietario</th><th>Precio</th><th>Estado</th><th></th>
+              <th>N° Reg.</th><th>Dirección</th><th>Barrio</th><th>Operación</th><th>Propietario</th><th>Precio</th><th>Estado</th><th></th>
             </tr>
           </thead>
           <tbody>
             {filtradas.map(p => (
               <tr key={p.id}>
+                <td>{p.numero_registro ? `#${p.numero_registro}` : '—'}</td>
                 <td>{p.direccion}</td>
                 <td>{p.barrio}</td>
                 <td>{p.operacion}</td>
