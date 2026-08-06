@@ -128,7 +128,7 @@ export default function Contratos() {
     }
     setModalAbierto(false)
     cargarDatos()
-  }
+    }
 
   async function eliminar(id) {
     if (!confirm('¿Eliminar este contrato?')) return
@@ -198,7 +198,7 @@ export default function Contratos() {
       await cargarGarantesYDocs(contratoSeleccionado.id)
     } else {
       alert('No se pudo subir el archivo: ' + errorSubida.message)
-      }
+    }
     setSubiendo(false)
     e.target.value = ''
   }
@@ -257,7 +257,6 @@ export default function Contratos() {
         en su carácter de <strong>LOCADOR</strong> y ${inquilino ? `el Señor/a <strong>${inquilino.nombre} ${inquilino.apellido}</strong>, Documento Nacional de Identidad Número ${inquilino.dni || '________'}, TE: ${inquilino.telefono || '________'}, con domicilio en ${inquilino.direccion || '________'}` : '________'},
         en adelante <strong>LOCATARIO</strong>, por otra parte, convienen de mutuo acuerdo en celebrar este contrato que se regirá de acuerdo a lo estipulado en el Código Civil y Comercial, disposiciones vigentes y por las siguientes cláusulas:
       </p>
-
       <p><span class="clausula-titulo">PRIMERA: INMUEBLE LOCADO:</span> El LOCADOR cede al LOCATARIO en Locación un inmueble de su propiedad ubicado en
         ${propiedad?.direccion || '________'}${propiedad?.barrio ? `, de Barrio ${propiedad.barrio}` : ''} de la provincia de CORDOBA.</p>
 
@@ -360,6 +359,8 @@ export default function Contratos() {
     `
   }
 
+  const [contenidoInicial, setContenidoInicial] = useState('')
+
   async function abrirEditorContrato(contrato) {
     const propiedad = propiedades.find(p => p.id === contrato.propiedad_id)
     const inquilino = clientes.find(c => c.id === contrato.cliente_id)
@@ -367,11 +368,20 @@ export default function Contratos() {
     const { data: gar } = await supabase.from('garantes').select('*').eq('contrato_id', contrato.id)
 
     const html = contrato.texto_contrato || generarClausulasHtml(contrato, propiedad, inquilino, propietario, gar)
+    setContenidoInicial(html)
     setContratoEditor(contrato)
     setModalTextoAbierto(true)
-    setTimeout(() => {
-      if (editorRef.current) editorRef.current.innerHTML = html
-    }, 0)
+  }
+
+  useEffect(() => {
+    if (modalTextoAbierto && editorRef.current) {
+      editorRef.current.innerHTML = contenidoInicial
+    }
+  }, [modalTextoAbierto, contenidoInicial])
+
+  function aplicarFormato(comando, valor = null) {
+    document.execCommand(comando, false, valor)
+    if (editorRef.current) editorRef.current.focus()
   }
 
   async function guardarTextoContrato() {
@@ -398,7 +408,7 @@ export default function Contratos() {
           .firmas { margin-top: 90px; display: flex; justify-content: space-between; }
           .firmas div { width: 45%; text-align: center; border-top: 1px solid #000; padding-top: 6px; }
           @media print { body { margin: 15px; } }
-          </style>
+        </style>
       </head>
       <body>${html}</body>
       </html>
@@ -580,17 +590,43 @@ export default function Contratos() {
           </div>
         </div>
       )}
+
       {modalTextoAbierto && contratoEditor && (
         <div className="modal-overlay" onClick={() => setModalTextoAbierto(false)}>
-          <div className="modal" style={{ width: 800, maxWidth: '95vw' }} onClick={e => e.stopPropagation()}>
+          <div className="modal" style={{ width: '95vw', maxWidth: 1100, height: '92vh', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
             <h2>Contrato — {nombreProp(contratoEditor.propiedad_id)}</h2>
             <p style={{ fontSize: 12, color: '#777' }}>Podés hacer clic en cualquier parte del texto y editarlo directamente.</p>
+
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10, padding: 8, background: '#f4f4f4', borderRadius: 6 }}>
+              <button type="button" className="btn-secondary" style={{ fontWeight: 'bold' }} onMouseDown={e => { e.preventDefault(); aplicarFormato('bold') }}>N</button>
+              <button type="button" className="btn-secondary" style={{ fontStyle: 'italic' }} onMouseDown={e => { e.preventDefault(); aplicarFormato('italic') }}>K</button>
+              <button type="button" className="btn-secondary" style={{ textDecoration: 'underline' }} onMouseDown={e => { e.preventDefault(); aplicarFormato('underline') }}>S</button>
+              <select onMouseDown={e => e.stopPropagation()} onChange={e => aplicarFormato('fontName', e.target.value)} defaultValue="">
+                <option value="" disabled>Tipo de letra</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+              </select>
+              <select onMouseDown={e => e.stopPropagation()} onChange={e => aplicarFormato('fontSize', e.target.value)} defaultValue="">
+                <option value="" disabled>Tamaño</option>
+                <option value="2">Chico</option>
+                <option value="3">Normal</option>
+                <option value="4">Mediano</option>
+                <option value="5">Grande</option>
+                <option value="6">Muy grande</option>
+              </select>
+              <button type="button" className="btn-secondary" onMouseDown={e => { e.preventDefault(); aplicarFormato('justifyLeft') }}>Izq</button>
+              <button type="button" className="btn-secondary" onMouseDown={e => { e.preventDefault(); aplicarFormato('justifyCenter') }}>Centro</button>
+              <button type="button" className="btn-secondary" onMouseDown={e => { e.preventDefault(); aplicarFormato('justifyFull') }}>Justificar</button>
+            </div>
+
             <div
               ref={editorRef}
               contentEditable
               suppressContentEditableWarning
               style={{
-                border: '1px solid #ccc', borderRadius: 8, padding: 20, maxHeight: '60vh', overflowY: 'auto',
+                border: '1px solid #ccc', borderRadius: 8, padding: 24, flex: 1, overflowY: 'auto',
                 fontFamily: "'Times New Roman', serif", fontSize: 14, lineHeight: 1.6, background: '#fff'
               }}
             />
