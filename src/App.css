@@ -1,0 +1,52 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f5f7; color: #222; }
+
+.login-page { display:flex; align-items:center; justify-content:center; height:100vh; background: linear-gradient(135deg,#5b2c8f,#7b3fb0); }
+.login-box { background:#fff; padding:40px; border-radius:12px; width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+.login-box h1 { font-size:22px; margin-bottom:4px; color:#5b2c8f; }
+.login-box p { margin-top:0; color:#777; font-size:13px; margin-bottom:20px; }
+.login-box input { width:100%; padding:10px; margin-bottom:12px; border:1px solid #ccc; border-radius:6px; }
+.login-box button { width:100%; padding:10px; background:#5b2c8f; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+.login-box button:disabled { opacity:0.6; }
+.error-msg { color:#c0392b; font-size:13px; margin-bottom:10px; }
+
+.app-layout { display:flex; min-height:100vh; }
+.sidebar { width:220px; background:#5b2c8f; color:#fff; padding:20px 0; flex-shrink:0; }
+.sidebar h2 { text-align:center; font-size:18px; margin-bottom:24px; }
+.sidebar a { display:block; padding:12px 24px; color:#dce3f0; text-decoration:none; font-size:14px; }
+.sidebar a.active, .sidebar a:hover { background:#7b3fb0; color:#fff; }
+.sidebar button.logout { margin:20px 24px 0; background:none; border:1px solid #9b6cc4; color:#dce3f0; padding:8px; border-radius:6px; cursor:pointer; width:calc(100% - 48px); }
+
+.main-content { flex:1; padding:28px 32px; }
+.main-content h1 { margin-top:0; color:#5b2c8f; }
+
+.toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:12px; flex-wrap:wrap; }
+.toolbar input, .toolbar select { padding:8px; border:1px solid #ccc; border-radius:6px; }
+.btn-primary { background:#5b2c8f; color:#fff; border:none; padding:9px 16px; border-radius:6px; cursor:pointer; font-weight:bold; }
+.btn-secondary { background:#eee; border:1px solid #ccc; padding:8px 14px; border-radius:6px; cursor:pointer; }
+.btn-danger { background:#c0392b; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; }
+
+table { width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+th, td { text-align:left; padding:10px 12px; border-bottom:1px solid #eee; font-size:14px; }
+th { background:#f0f2f7; color:#333; }
+tr:hover td { background:#fafbfe; }
+
+.badge { padding:3px 8px; border-radius:12px; font-size:12px; font-weight:bold; color:#fff; }
+.badge.disponible, .badge.vigente, .badge.pagado { background:#27ae60; }
+.badge.reservada, .badge.pendiente { background:#e67e22; }
+.badge.alquilada, .badge.vendida, .badge.finalizado { background:#7f8c8d; }
+.badge.rescindido { background:#c0392b; }
+
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:50; }
+.modal { background:#fff; padding:24px; border-radius:10px; width:420px; max-height:88vh; overflow-y:auto; }
+.modal h2 { margin-top:0; }
+.modal label { display:block; font-size:13px; margin:10px 0 4px; color:#444; }
+.modal input, .modal select, .modal textarea { width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; }
+.modal-actions { margin-top:20px; display:flex; justify-content:flex-end; gap:10px; }
+
+.dashboard-cards { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+.card { background:#fff; padding:18px 22px; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,0.08); min-width:160px; }
+.card .num { font-size:28px; font-weight:bold; color:#5b2c8f; }
+.card .label { font-size:13px; color:#777; }
+
+.empty { padding:20px; text-align:center; color:#999; }
