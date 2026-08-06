@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 
-const vacio = { nombre: '', apellido: '', dni: '', telefono: '', email: '', direccion: '', tipo: 'inquilino', fecha_nacimiento: '' }
+const vacio = { nombre: '', apellido: '', tipo_documento: 'DNI', dni: '', telefono: '', email: '', direccion: '', tipo: 'inquilino', fecha_nacimiento: '' }
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([])
@@ -27,13 +27,27 @@ export default function Clientes() {
   }
 
   function abrirEditar(c) {
-    setForm({ ...c, fecha_nacimiento: c.fecha_nacimiento || '' })
+    setForm({ ...vacio, ...c, fecha_nacimiento: c.fecha_nacimiento || '', tipo_documento: c.tipo_documento || 'DNI' })
     setEditandoId(c.id)
     setModalAbierto(true)
   }
 
   async function guardar(e) {
     e.preventDefault()
+
+    const dniLimpio = (form.dni || '').trim()
+    if (dniLimpio) {
+      const duplicado = clientes.find(c =>
+        (c.dni || '').trim() === dniLimpio && c.id !== editandoId
+      )
+      if (duplicado) {
+        const seguir = confirm(
+          `Ya hay un cliente cargado con ${duplicado.tipo_documento || 'DNI'} ${dniLimpio}: ${duplicado.nombre} ${duplicado.apellido}.\n\n¿Querés guardarlo igual?`
+        )
+        if (!seguir) return
+      }
+    }
+
     const payload = { ...form, fecha_nacimiento: form.fecha_nacimiento || null }
     if (editandoId) {
       await supabase.from('clientes').update(payload).eq('id', editandoId)
@@ -58,7 +72,7 @@ export default function Clientes() {
     <div>
       <h1>Clientes</h1>
       <div className="toolbar">
-        <input placeholder="Buscar por nombre o DNI..." value={busqueda} onChange={e => setBusqueda(e.target.value)} />
+        <input placeholder="Buscar por nombre o documento..." value={busqueda} onChange={e => setBusqueda(e.target.value)} />
         <button className="btn-primary" onClick={abrirNuevo}>+ Nuevo cliente</button>
       </div>
 
@@ -68,14 +82,14 @@ export default function Clientes() {
         <table>
           <thead>
             <tr>
-              <th>Nombre</th><th>DNI</th><th>Tipo</th><th>Teléfono</th><th>Email</th><th></th>
+              <th>Nombre</th><th>Documento</th><th>Tipo</th><th>Teléfono</th><th>Email</th><th></th>
             </tr>
           </thead>
           <tbody>
             {filtrados.map(c => (
               <tr key={c.id}>
                 <td>{c.nombre} {c.apellido}</td>
-                <td>{c.dni}</td>
+                <td>{c.dni ? `${c.tipo_documento || 'DNI'} ${c.dni}` : '—'}</td>
                 <td>{c.tipo}</td>
                 <td>{c.telefono}</td>
                 <td>{c.email}</td>
@@ -98,7 +112,13 @@ export default function Clientes() {
               <input required value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} />
               <label>Apellido</label>
               <input required value={form.apellido} onChange={e => setForm({ ...form, apellido: e.target.value })} />
-              <label>DNI</label>
+              <label>Tipo de documento</label>
+              <select value={form.tipo_documento} onChange={e => setForm({ ...form, tipo_documento: e.target.value })}>
+                <option value="DNI">DNI</option>
+                <option value="CUIT">CUIT</option>
+                <option value="CUIL">CUIL</option>
+              </select>
+              <label>Número de documento</label>
               <input value={form.dni} onChange={e => setForm({ ...form, dni: e.target.value })} />
               <label>Tipo</label>
               <select value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })}>
